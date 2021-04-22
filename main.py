@@ -1,16 +1,15 @@
-# This is a sample Python script.
+import json
 
-# Press Maj+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import numpy as np
+
+from Sprint_repetes_IMU import Traitement_sprint_IMU
+
+with open("DATAS/A2_Roue Gauche_raw.json", "r") as read_file:
+    DATARG = json.load(read_file)
+with open("DATAS/A1_Roue Droite_raw.json", "r") as read_file:
+    DATARD = json.load(read_file)
+with open("DATAS/information_evaluation.json", "r") as read_file:
+    INFOS = json.load(read_file)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+Traitement_sprint_IMU(DATARG, DATARD, INFOS)
