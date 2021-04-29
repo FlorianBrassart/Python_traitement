@@ -193,6 +193,7 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
                         Asy[0], Asy[1], Asy[2], np.mean(Asy[0:2]), np.mean(Asy[-5:-1]), cadence
                         ]
 
+
         RECAP_Sprint.extend(RECAP_Sprint1)
 
 
