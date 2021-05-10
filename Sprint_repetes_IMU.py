@@ -1,3 +1,5 @@
+import json
+
 import numpy
 import numpy as np
 import scipy as sp
@@ -20,8 +22,8 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
     Mwz1 = np.deg2rad(np.asarray(Roue_G["gyro_z"]))
     Mwxy1 = np.deg2rad(np.sqrt(np.square(np.asarray(Roue_G["gyro_x"])) + np.square(np.asarray(Roue_G["gyro_y"]))))
     rayon_roue=float(INFOS["taille_roues"])/78.74
-    VitesseRD1 = (Mwz - (Mwxy * tan0 * signe)) * rayon_roue * 3.6;
-    VitesseRG1 = (Mwz1 - (Mwxy1 * tan0 * (-signe))) * rayon_roue * 3.6;
+    VitesseRD1 = (Mwz - (Mwxy * tan0 * signe)) * rayon_roue * 3.6
+    VitesseRG1 = (Mwz1 - (Mwxy1 * tan0 * (-signe))) * rayon_roue * 3.6
     from scipy.signal import butter, lfilter
     from scipy.signal import freqs
     cutOff=8
@@ -68,6 +70,51 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
             Events.append(pos)
     Events.append(len(Vitesse_mean))
     RECAP_Sprint=[]
+    maxpeakRD1_sprint = []
+    maxpeakRD2_sprint = []
+    maxpeakRD3_sprint = []
+    maxpeakRG1_sprint = []
+    maxpeakRG2_sprint = []
+    maxpeakRG3_sprint = []
+    maxpeakmean1_sprint = []
+    maxpeakmean2_sprint = []
+    maxpeakmean3_sprint = []
+    Vmoy_stabRD_sprint = []
+    Vmoy_stabRG_sprint = []
+    Vmoy_stab_sprint = []
+    Vmoy_start_sprint = []
+    Vmax_sprint = []
+    Vmean_sprint = []
+    accstart_sprint = []
+    Accmax_sprint = []
+    Acc_moy_sprint = []
+    Accstab_sprint = []
+    Dist_vmax_sprint = []
+    Temps_sprint_sprint = []
+    tpsP1_sprint = []
+    tpsP2_sprint = []
+    tpsP3_sprint = []
+    tpsP_meanstart_sprint = []
+    tpsP_meanstab_sprint = []
+    tpsR1_sprint = []
+    tpsR2_sprint = []
+    tpsR3_sprint = []
+    tpsR_meanstart_sprint = []
+    tpsR_meanstab_sprint = []
+    tpsC1_sprint = []
+    tpsC2_sprint = []
+    tpsC3_sprint = []
+    tpsC_meanstart_sprint = []
+    tpsC_meanstab_sprint = []
+    Asy1_sprint = []
+    Asy2_sprint = []
+    Asy3_sprint = []
+    Asy_meanstart_sprint = []
+    Asy_meanstab_sprint = []
+    cadence_sprint = []
+
+
+
     for E in range(len(Events)-1):
         Vitesse_E = []
         Vitesse_E = Vitesse_mean[Events[E]:Events[E+1]]
@@ -81,7 +128,7 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
         Vmean = numpy.mean(Vitesse_mean_sprint)
         Vmax = numpy.max(Vitesse_mean_sprint)
         Vmax_pos= numpy.where(Vitesse_mean_sprint==Vmax)
-        Dist_vmax=meandist_E[Vmax_pos]
+        Dist_vmax=float(meandist_E[Vmax_pos])
         Accmax = np.max(Acc_sprint)
         Acc_moy = np.mean(Acc_sprint)
         peaksRG, properties = find_peaks(VitesseRG_sprint, distance=45, prominence=0.8)
@@ -186,7 +233,7 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
                         Vmoy_stabRD, Vmoy_stabRG, Vmoy_stab,
                         Vmoy_start, Vmax, Vmean,
                         accstart, Accmax, Acc_moy, Accstab,
-                        Dist_vmax, Vmoy_start,
+                        Dist_vmax, Temps_sprint,
                         tpsP[0], tpsP[1], tpsP[2], np.mean(tpsP[0:2]), np.mean(tpsP[-5:-1]),
                         tpsR[0], tpsR[1], tpsR[2], np.mean(tpsR[0:2]), np.mean(tpsR[-5:-1]),
                         tpsC[0], tpsC[1], tpsC[2], np.mean(tpsC[0:2]), np.mean(tpsC[-5:-1]),
@@ -195,8 +242,77 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
 
 
         RECAP_Sprint.extend(RECAP_Sprint1)
+        maxpeakRD1_sprint.append(round(maxpeakRD1, 2))
+        maxpeakRD2_sprint.append(round(maxpeakRD2, 2))
+        maxpeakRD3_sprint.append(round(maxpeakRD3, 2))
+        maxpeakRG1_sprint.append(round(maxpeakRG1, 2))
+        maxpeakRG2_sprint.append(round(maxpeakRG2, 2))
+        maxpeakRG3_sprint.append(round(maxpeakRG3, 2))
+        maxpeakmean1_sprint.append(round(maxpeakmean1, 2))
+        maxpeakmean2_sprint.append(round(maxpeakmean2, 2))
+        maxpeakmean3_sprint.append(round(maxpeakmean3, 2))
+        Vmoy_stabRD_sprint.append(round(Vmoy_stabRD, 2))
+        Vmoy_stabRG_sprint.append(round(Vmoy_stabRG, 2))
+        Vmoy_stab_sprint.append(round(Vmoy_stab, 2))
+        Vmoy_start_sprint.append(round(Vmoy_start, 2))
+        Vmax_sprint.append(round(Vmax, 2))
+        Vmean_sprint.append(round(Vmean, 2))
+        accstart_sprint.append(round(accstart, 2))
+        Accmax_sprint.append(round(Accmax, 2))
+        Acc_moy_sprint.append(round(Acc_moy, 2))
+        Accstab_sprint.append(round(Accstab, 2))
+        Dist_vmax_sprint.append(round(Dist_vmax, 2))
+        Temps_sprint_sprint.append(round(Temps_sprint, 2))
+        tpsP1_sprint.append(round(tpsP[0], 2))
+        tpsP2_sprint.append(round(tpsP[1], 2))
+        tpsP3_sprint.append(round(tpsP[2], 2))
+        tpsP_meanstart_sprint.append(round(np.mean(tpsP[0:2]), 2))
+        tpsP_meanstab_sprint.append(round(np.mean(tpsP[-5:-1]), 2))
+        tpsR1_sprint.append(round(tpsR[0], 2))
+        tpsR2_sprint.append(round(tpsR[1], 2))
+        tpsR3_sprint.append(round(tpsR[2], 2))
+        tpsR_meanstart_sprint.append(round(np.mean(tpsR[0:2]), 2))
+        tpsR_meanstab_sprint.append(round(np.mean(tpsR[-5:-1]), 2))
+        tpsC1_sprint.append(round(tpsC[0], 2))
+        tpsC2_sprint.append(round(tpsC[1], 2))
+        tpsC3_sprint.append(round(tpsC[2], 2))
+        tpsC_meanstart_sprint.append(round(np.mean(tpsC[0:2]), 2))
+        tpsC_meanstab_sprint.append(round(np.mean(tpsC[-5:-1]), 2))
+        Asy1_sprint.append(round(Asy[0], 2))
+        Asy2_sprint.append(round(Asy[1], 2))
+        Asy3_sprint.append(round(Asy[2], 2))
+        Asy_meanstart_sprint.append(round(np.mean(Asy[0:2]), 2))
+        Asy_meanstab_sprint.append(round(np.mean(Asy[-5:-1]), 2))
+        cadence_sprint.append(round(cadence, 2))
 
 
-    return 0
+    Best_tps = numpy.min(Temps_sprint_sprint)
+    best_nb = numpy.where(Temps_sprint_sprint == Best_tps)[0][0]
+
+    RECAP_Sprint_best = {'pic_roue_droite_1': maxpeakRD1_sprint[best_nb], 'pic_roue_gauche_1': maxpeakRG1_sprint[best_nb], 'moyenne_pic_1_D&G': maxpeakmean1_sprint[best_nb],
+                         'pic_roue_droite_2': maxpeakRD2_sprint[best_nb], 'pic_roue_gauche_2': maxpeakRG2_sprint[best_nb], 'moyenne_pic_2_D&G': maxpeakmean2_sprint[best_nb],
+                         'pic_roue_droite_3': maxpeakRD3_sprint[best_nb], 'pic_roue_gauche_3': maxpeakRG3_sprint[best_nb], 'moyenne_pic_3_D&G': maxpeakmean3_sprint[best_nb],
+                         'Vmoy_start_D&G' : Vmoy_start_sprint[best_nb], 'Vmoy_stab_roue_droite': Vmoy_stabRD_sprint[best_nb], 'Vmoy_stab_roue_gauche': Vmoy_stabRG_sprint[best_nb], 'Vmoy_stab_D&G': Vmoy_stab_sprint[best_nb],
+                         'Vitesse_max': Vmax_sprint[best_nb], 'Vitesse_moyenne': Vmean_sprint[best_nb], 'Distance_Vmax': Dist_vmax_sprint[best_nb], 'Temps_sprint': Temps_sprint_sprint[best_nb],
+                         'Acceleration_start': accstart_sprint[best_nb], 'Acceleration_max': Accmax_sprint[best_nb], 'Acceleration_moyenne': Acc_moy_sprint[best_nb], 'Acceleration_stab': Accstab_sprint[best_nb],
+                         'Temps_poussee_1': tpsP1_sprint[best_nb], 'Temps_poussee_2': tpsP2_sprint[best_nb],'Temps_poussee_3': tpsP3_sprint[best_nb],
+                         'Temps_recouvrement_1': tpsR1_sprint[best_nb], 'Temps_recouvrement_2': tpsR2_sprint[best_nb],'Temps_recouvrement_3': tpsR3_sprint[best_nb],
+                         'Temps_Cycle_1': tpsC1_sprint[best_nb], 'Temps_Cycle_2': tpsC2_sprint[best_nb],'Temps_Cycle_3': tpsC3_sprint[best_nb],
+                         'Asymetrie_poussee_1': Asy1_sprint[best_nb], 'Asymetrie_poussee_2': Asy2_sprint[best_nb], 'Asymetrie_poussee_3': Asy3_sprint[best_nb], 'Asymetrie_start': Asy_meanstart_sprint[best_nb], 'Asymetrie_stab': Asy_meanstab_sprint[best_nb], 'cadence': cadence_sprint[best_nb]}
+
+    RECAP_Sprint_last = {'pic roue droite 1': maxpeakRD1_sprint[-1], 'pic roue gauche 1': maxpeakRG1_sprint[-1],'moyenne_pic_1_D&G': maxpeakmean1_sprint[-1],
+                         'pic_roue_droite_2': maxpeakRD2_sprint[-1], 'pic_roue_gauche_2': maxpeakRG2_sprint[-1], 'moyenne_pic_2_D&G': maxpeakmean2_sprint[-1],
+                         'pic_roue_droite_3': maxpeakRD3_sprint[-1], 'pic_roue_gauche_3': maxpeakRG3_sprint[-1], 'moyenne_pic_3_D&G': maxpeakmean3_sprint[-1],
+                         'Vmoy_start_D&G' : Vmoy_start_sprint[-1], 'Vmoy_stab_roue_droite': Vmoy_stabRD_sprint[-1], 'Vmoy_stab_roue_gauche': Vmoy_stabRG_sprint[-1], 'Vmoy_stab_D&G': Vmoy_stab_sprint[-1],
+                         'Vitesse_max': Vmax_sprint[-1], 'Vitesse_moyenne': Vmean_sprint[-1], 'Distance_Vmax': Dist_vmax_sprint[-1], 'Temps_sprint': Temps_sprint_sprint[-1],
+                         'Acceleration_start': accstart_sprint[-1], 'Acceleration_max': Accmax_sprint[-1], 'Acceleration_moyenne': Acc_moy_sprint[-1], 'Acceleration_stab': Accstab_sprint[-1],
+                         'Temps_poussee_1': tpsP1_sprint[-1], 'Temps_poussee_2': tpsP2_sprint[-1],'Temps_poussee_3': tpsP3_sprint[-1],
+                         'Temps_recouvrement_1': tpsR1_sprint[-1], 'Temps_recouvrement_2': tpsR2_sprint[-1],'Temps_recouvrement_3': tpsR3_sprint[-1],
+                         'Temps_Cycle_1': tpsC1_sprint[-1], 'Temps_Cycle_2': tpsC2_sprint[-1],'Temps_Cycle_3': tpsC3_sprint[-1],
+                         'Asymetrie_poussee_1': Asy1_sprint[-1], 'Asymetrie_poussee_2': Asy2_sprint[-1], 'Asymetrie_poussee_3': Asy3_sprint[-1], 'Asymetrie_start': Asy_meanstart_sprint[-1], 'Asymetrie_stab': Asy_meanstab_sprint[-1], 'cadence': cadence_sprint[-1]}
+
+
+
+    return RECAP_Sprint_best, RECAP_Sprint_last
 
 
