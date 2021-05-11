@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 19 17:02:18 2021
+
+@author: flo_b
+"""
+print('check DATAS')
 import numpy as np
 
 
@@ -13,8 +20,11 @@ def check_data(Roue_G, Roue_D):
         print("inversion roue droite")
     if len(Roue_G["gyro_z"]) < len(Roue_D["gyro_z"]):
         Roue_D["gyro_z"] = Roue_D["gyro_z"][0:len(Roue_G["gyro_z"])]
+        Roue_D["gyro_z"] = Roue_D["gyro_z"][0:len(Roue_G["gyro_z"])]
+        Roue_D["gyro_z"] = Roue_D["gyro_z"][0:len(Roue_G["gyro_z"])]
 
     if len(Roue_G["gyro_z"]) > len(Roue_D["gyro_z"]):
         Roue_G["gyro_z"] = Roue_G["gyro_z"][0:len(Roue_D["gyro_z"])]
-
+        Roue_G["gyro_x"] = Roue_G["gyro_x"][0:len(Roue_D["gyro_x"])]
+        Roue_G["gyro_y"] = Roue_G["gyro_y"][0:len(Roue_D["gyro_y"])]
     return Roue_G, Roue_D

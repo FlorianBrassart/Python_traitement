@@ -1,33 +1,35 @@
-import json
+# -*- coding: utf-8 -*-
+"""
+Created on Wed May 19 17:01:26 2021
 
+@author: flo_b
+"""
+print('calcul')
 import numpy
 import numpy as np
-import scipy as sp
 import scipy.integrate as integrate
 from scipy import signal
 from scipy.signal import find_peaks
 from check_data import check_data
 import matplotlib.pyplot as plt
 
-
 def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
     Roue_G, Roue_D = check_data(Roue_G, Roue_D)
-    FrHZ=128
-    dif=np.asarray(Roue_G["gyro_z"])-np.asarray(Roue_D["gyro_z"])
-    dif[dif==0]=0.0001
-    signe=dif/abs(dif)
-    Mwz=np.deg2rad(np.asarray(Roue_D["gyro_z"]))
+    print('fin check')
+    FrHZ = 128
+    dif = np.asarray(Roue_G["gyro_z"])-np.asarray(Roue_D["gyro_z"])
+    dif[dif == 0] = 0.0001
+    signe = dif/abs(dif)
+    Mwz = np.deg2rad(np.asarray(Roue_D["gyro_z"]))
     Mwxy = np.deg2rad(np.sqrt(np.square(np.asarray(Roue_D["gyro_x"]))+np.square(np.asarray(Roue_D["gyro_y"]))))
-    tan0=np.deg2rad(np.tan(float(INFOS["angle_carossage"])))
+    tan0 = np.deg2rad(np.tan(float(INFOS["angle_carossage"])))
     Mwz1 = np.deg2rad(np.asarray(Roue_G["gyro_z"]))
     Mwxy1 = np.deg2rad(np.sqrt(np.square(np.asarray(Roue_G["gyro_x"])) + np.square(np.asarray(Roue_G["gyro_y"]))))
-    rayon_roue=float(INFOS["taille_roues"])/78.74
+    rayon_roue = float(INFOS["taille_roues"])/78.74
     VitesseRD1 = (Mwz - (Mwxy * tan0 * signe)) * rayon_roue * 3.6
     VitesseRG1 = (Mwz1 - (Mwxy1 * tan0 * (-signe))) * rayon_roue * 3.6
-    from scipy.signal import butter, lfilter
-    from scipy.signal import freqs
-    cutOff=8
-    fs=FrHZ
+    cutOff = 8
+    fs = FrHZ
     b, a = signal.butter(4, 14/FrHZ)
     VitesseRD = signal.filtfilt(b, a, VitesseRD1)
     VitesseRG = signal.filtfilt(b, a, VitesseRG1)
@@ -40,27 +42,23 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
     distRD = (integrate.cumtrapz(VitesseRD/3.6)/FrHZ)
     distRG = (integrate.cumtrapz(VitesseRG/3.6)/FrHZ)
 
-
-    seuil=8
-    start1= numpy.where(Vitesse_mean>seuil)
+    seuil = np.max(Vitesse_mean)/2
+    start1 = numpy.where(Vitesse_mean>seuil)
     x=start1[0][0]
     while Vitesse_mean[x] > 0.21:
         x = x-1
+    x = int(x)
 
-    x=int(x)
-
-
-    Event=[]
-    Event_pos=[]
-    Events=[]
+    Event = []
+    Event_pos = []
+    Events = []
 
     for e in range(len(Vitesse_mean)-x):
-
         if Vitesse_mean[x+e]>seuil:
            Event.append(Vitesse_mean[x+e])
            Event_pos.append(x+e)
-    count=0
-    Events=[x]
+
+    Events = [x]
     for b in range(len(Event)-1):
         if Event_pos[b+1]-Event_pos[b] > 7*FrHZ:
             pos = Event_pos[b+1]
@@ -113,8 +111,6 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
     Asy_meanstab_sprint = []
     cadence_sprint = []
 
-
-
     for E in range(len(Events)-1):
         Vitesse_E = []
         Vitesse_E = Vitesse_mean[Events[E]:Events[E+1]]
@@ -123,17 +119,17 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
         Vitesse_mean_sprint = Vitesse_E[0:END_Events+1]
         VitesseRG_sprint = VitesseRG[Events[E]:END_Events + Events[E] + 1]
         VitesseRD_sprint = VitesseRD[Events[E]:END_Events + Events[E] + 1]
-        Acc_sprint = accmean [Events[E]:END_Events + Events[E] + 1]
+        Acc_sprint = accmean[Events[E]:END_Events + Events[E] + 1]
         Temps_sprint = ((END_Events+Events[E]) - Events[E])/FrHZ
         Vmean = numpy.mean(Vitesse_mean_sprint)
         Vmax = numpy.max(Vitesse_mean_sprint)
         Vmax_pos= numpy.where(Vitesse_mean_sprint==Vmax)
-        Dist_vmax=float(meandist_E[Vmax_pos])
+        Dist_vmax = float(meandist_E[Vmax_pos])
         Accmax = np.max(Acc_sprint)
         Acc_moy = np.mean(Acc_sprint)
-        peaksRG, properties = find_peaks(VitesseRG_sprint, distance=45, prominence=0.8)
-        peaksRG_min=[0]
-        peaksRD_min=[0]
+        peaksRG, properties = find_peaks(VitesseRG_sprint, width=12, distance=25, prominence=0.6)
+        peaksRG_min = [0]
+        peaksRD_min = [0]
         for pm in range(len(peaksRG)):
             if pm < len(peaksRG)-1:
                 minp = numpy.min(VitesseRG_sprint[peaksRG[pm]:peaksRG[pm+1]])
@@ -143,8 +139,7 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
                 minpos = np.asarray(numpy.where(VitesseRG_sprint == minp))
             peaksRG_min.append(int(minpos))
 
-
-        peaksRD, properties = find_peaks(VitesseRD_sprint, distance=45, prominence=0.8)
+        peaksRD, properties = find_peaks(VitesseRD_sprint, width=12, distance=25, prominence=0.6)
         for pm2 in range(len(peaksRD)):
             if pm2<len(peaksRD)-1:
                 minp = numpy.min(VitesseRD_sprint[peaksRD[pm2]:peaksRD[pm2+1]])
@@ -177,7 +172,7 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
                        VitesseRG_sprint[peaksRG[-2]] + VitesseRG_sprint[peaksRG[-1]]) / 5
         Vmoy_stab   = (Vmoy_stabRD+Vmoy_stabRG)/2
 
-        Accstab = np.mean(Acc_sprint[peaksRG[-5]:-1])
+        Accstab = np.mean(Acc_sprint[peaksRG[-5]:peaksRG[-1]])
 
         ecart=len(peaksRD) - len(peaksRG)
         if ecart <= 0:
@@ -240,7 +235,6 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
                         Asy[0], Asy[1], Asy[2], np.mean(Asy[0:2]), np.mean(Asy[-5:-1]), cadence
                         ]
 
-
         RECAP_Sprint.extend(RECAP_Sprint1)
         maxpeakRD1_sprint.append(round(maxpeakRD1, 2))
         maxpeakRD2_sprint.append(round(maxpeakRD2, 2))
@@ -285,17 +279,37 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
         Asy_meanstab_sprint.append(round(np.mean(Asy[-5:-1]), 2))
         cadence_sprint.append(round(cadence, 2))
 
-        import matplotlib.pyplot as plt
-        plt.plot(meandist_E[0:END_Events+1], Vitesse_mean_sprint, label = 'sprint_'+str(E+1))
+        plt.plot(meandist_E[0:END_Events+1], Vitesse_mean_sprint, linewidth=1, label='sprint_'+str(E+1))
         plt.legend()
 
     plt.grid(True)
     plt.xlabel('Distance (m)')
     plt.ylabel('Vitesse (Km/h)')
-    plt.savefig('all_sprint.png')
+    plt.savefig('Images/all_sprint.png')
     plt.close()
-    Best_tps = numpy.min(Temps_sprint_sprint)
-    best_nb = numpy.where(Temps_sprint_sprint == Best_tps)[0][0]
+    best_tps = numpy.min(Temps_sprint_sprint)
+    best_nb = numpy.where(Temps_sprint_sprint == best_tps)[0][0]
+
+
+    Vitesse_best_sprint_E = Vitesse_mean[Events[best_nb]:Events[best_nb+1]]
+    meandist_bestsprint_E = (integrate.cumtrapz(Vitesse_best_sprint_E / 3.6) / FrHZ)
+    END_Events_best = numpy.where(meandist_bestsprint_E >= 19.999)[0][0]
+    Vitesse_mean_bestsprint = Vitesse_best_sprint_E[0:END_Events_best + 1]
+
+    Vitesse_sprint6_E = Vitesse_mean[Events[-2]:Events[-1]]
+    meandist_sprint6_E = (integrate.cumtrapz(Vitesse_sprint6_E / 3.6) / FrHZ)
+    END_Events_6 = numpy.where(meandist_sprint6_E >= 19.999)[0][0]
+    Vitesse_mean_sprint6 = Vitesse_sprint6_E[0:END_Events_6 + 1]
+
+    plt.plot(meandist_bestsprint_E[0:END_Events_best + 1], Vitesse_mean_bestsprint, color='blue', linewidth=1, label='sprint_' + str(best_nb+1))
+    plt.plot(meandist_sprint6_E[0:END_Events_6 + 1], Vitesse_mean_sprint6, color='red', linewidth=1, label='sprint_' + str(len(Events)-1))
+    plt.legend(loc='lower right')
+    plt.grid(True)
+    plt.xlabel('Distance (m)')
+    plt.ylabel('Vitesse (Km/h)')
+    plt.savefig('Images/Bestand6_sprint.png')
+    plt.close()
+
 
     RECAP_Sprint_best = {'pic_roue_droite_1': maxpeakRD1_sprint[best_nb], 'pic_roue_gauche_1': maxpeakRG1_sprint[best_nb], 'moyenne_pic_1_D&G': maxpeakmean1_sprint[best_nb],
                          'pic_roue_droite_2': maxpeakRD2_sprint[best_nb], 'pic_roue_gauche_2': maxpeakRG2_sprint[best_nb], 'moyenne_pic_2_D&G': maxpeakmean2_sprint[best_nb],
