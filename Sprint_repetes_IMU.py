@@ -285,7 +285,15 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
         Asy_meanstab_sprint.append(round(np.mean(Asy[-5:-1]), 2))
         cadence_sprint.append(round(cadence, 2))
 
+        import matplotlib.pyplot as plt
+        plt.plot(meandist_E[0:END_Events+1], Vitesse_mean_sprint, label = 'sprint_'+str(E+1))
+        plt.legend()
 
+    plt.grid(True)
+    plt.xlabel('Distance (m)')
+    plt.ylabel('Vitesse (Km/h)')
+    plt.savefig('all_sprint.png')
+    plt.close()
     Best_tps = numpy.min(Temps_sprint_sprint)
     best_nb = numpy.where(Temps_sprint_sprint == Best_tps)[0][0]
 

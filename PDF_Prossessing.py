@@ -13,7 +13,7 @@ def pdf_prossessing(RECAP_Sprint_best, RECAP_Sprint_last, INFOS):
     fatigue_index = round(((RECAP_Sprint_last["Temps_sprint"] - RECAP_Sprint_best["Temps_sprint"]) / RECAP_Sprint_last["Temps_sprint"])*100, 1)
 
     from math import pi
-
+# graph radar
     # Set data
     df = pd.DataFrame({
         'Sprint': ['6', 'Best'],
@@ -62,7 +62,7 @@ def pdf_prossessing(RECAP_Sprint_best, RECAP_Sprint_last, INFOS):
     plt.savefig("plot.png")
     plt.close()
 
-
+# Graph bar
     barWidth = 0.3
 
 
@@ -84,6 +84,10 @@ def pdf_prossessing(RECAP_Sprint_best, RECAP_Sprint_last, INFOS):
     # plt.show()
     plt.savefig("plotbar.png")
 
+# graph vitesse sprint
+
+
+# PDF page 1
     packet = io.BytesIO()
     canvas = canvas.Canvas(packet, pagesize=letter)
 
@@ -94,7 +98,7 @@ def pdf_prossessing(RECAP_Sprint_best, RECAP_Sprint_last, INFOS):
     canvas.setFont('Helvetica', 11)
     canvas.drawString(340, 585, INFOS["angle_carossage"])
     canvas.drawString(340, 570, INFOS["taille_roues"])
-    canvas.drawString(480, 630, INFOS["date"])
+    canvas.drawString(150, 600, INFOS["date"])
     canvas.drawString(150, 197, str(RECAP_Sprint_best["Vmoy_start_D&G"]))
     canvas.drawString(150, 182, str(RECAP_Sprint_best["Vmoy_stab_D&G"]))
     canvas.drawString(150, 167, str(RECAP_Sprint_best["Vitesse_moyenne"]))
@@ -117,13 +121,33 @@ def pdf_prossessing(RECAP_Sprint_best, RECAP_Sprint_last, INFOS):
     canvas.drawString(170, 60, (str(fatigue_index) + " %"))
     canvas.save()
     packet.seek(0)
+
+
+
     new_pdf = PdfFileReader(packet)
+
     pdf_path = 'Model_Rapport_sprints_repetes.pdf'
     pdf = PdfFileReader(str(pdf_path))
     output = PdfFileWriter()
     page = pdf.getPage(0)
+    page2 = pdf.getPage(1)
     page.mergePage(new_pdf.getPage(0))
+
     output.addPage(page)
+
+    # PDF page 2
+    from reportlab.pdfgen import canvas
+    packet2 = io.BytesIO()
+    c = canvas.Canvas(packet2, pagesize=letter)
+    c.drawImage('all_sprint.png', 52, 450, width=500, height=300, preserveAspectRatio=False)
+    c.save()
+    packet2.seek(0)
+    new_pdf2 = PdfFileReader(packet2)
+
+    page2.mergePage(new_pdf2.getPage(0))
+
+
+    output.addPage(page2)
     outputStream = open("Rapport_sprint_repetes" + INFOS["nom_test"] + ".pdf", "wb")
     output.write(outputStream)
     outputStream.close()
