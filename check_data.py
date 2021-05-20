@@ -7,7 +7,6 @@ Created on Wed May 19 17:02:18 2021
 print('check DATAS')
 import numpy as np
 
-
 def check_data(Roue_G, Roue_D):
     Roue_G = dict(Roue_G, gyro_z= np.asarray(Roue_G["gyro_z"])* (4000/pow(2,16)), gyro_x=np.asarray(Roue_G["gyro_x"]) * (4000/pow(2,16)), gyro_y=np.asarray(Roue_G["gyro_y"]) * (4000/pow(2,16)) )
     Roue_D = dict(Roue_D, gyro_z= np.asarray(Roue_D["gyro_z"]) * (4000/pow(2,16)), gyro_x=np.asarray(Roue_D["gyro_x"]) * (4000/pow(2,16)), gyro_y=np.asarray(Roue_D["gyro_y"]) * (4000/pow(2,16)) )

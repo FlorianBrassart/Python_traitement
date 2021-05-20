@@ -42,7 +42,7 @@ def Traitement_sprint_IMU(Roue_G, Roue_D, INFOS):
     distRD = (integrate.cumtrapz(VitesseRD/3.6)/FrHZ)
     distRG = (integrate.cumtrapz(VitesseRG/3.6)/FrHZ)
 
-    seuil = np.max(Vitesse_mean)/2
+    seuil = np.max(Vitesse_mean)/1.6
     start1 = numpy.where(Vitesse_mean>seuil)
     x=start1[0][0]
     while Vitesse_mean[x] > 0.21:

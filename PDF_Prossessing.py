@@ -16,7 +16,6 @@ from reportlab.lib.pagesizes import letter
 def pdf_prossessing(RECAP_Sprint_best, RECAP_Sprint_last, INFOS):
     from reportlab.pdfgen import canvas
     fatigue_index = round(((RECAP_Sprint_last["Temps_sprint"] - RECAP_Sprint_best["Temps_sprint"]) / RECAP_Sprint_last["Temps_sprint"])*100, 1)
-
     from math import pi
 # graph radar
     # Set data

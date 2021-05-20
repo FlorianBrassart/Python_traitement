@@ -20,7 +20,6 @@ with open("DATAS/" + fichier_roue_droite[0], "r") as read_file:
 with open("DATAS/" + fichier_info[0], "r") as read_file:
     INFOS = json.load(read_file)
 
-
 RECAP_Sprint_best, RECAP_Sprint_last = Traitement_sprint_IMU(DATARG, DATARD, INFOS)
 print('fin des calculs')
 from PDF_Prossessing import pdf_prossessing
